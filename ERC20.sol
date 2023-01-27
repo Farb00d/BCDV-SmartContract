@@ -81,32 +81,19 @@ contract ERC20 is IERC20 {
      * - the caller must have a balance of at least `amount`.
      */
     function transfer(address to, uint256 amount) public virtual override returns (bool) {
-         
-        /* <------ Your code goes here ------->
+    
+         /* <------ Your code goes here ------->
          */
+       
+    require(to != address(0), "ERC20: transfer to the zero address");
+    require(_balances[msg.sender] >= amount, "ERC20: transfer amount exceeds balance");
 
-        require(to != address(0), "ERC20: transfer to the zero address");
-        require(_balances[msg.sender] >= amount, "ERC20: transfer amount exceeds balance");
+    _balances[msg.sender] -= amount;
+    _balances[to] += amount;
 
-        _balances[msg.sender] -= amount;
-        _balances[to] += amount;
-        emit Transfer(msg.sender, to, amount);
-        return true;
-        
-         
-      
-    /*
-    function transfer(address to, uint256 amount) public virtual override returns (bool) {
-        require(to != address(0), "ERC20: transfer to the zero address");
-        require(_balances[msg.sender] >= amount, "ERC20: transfer amount exceeds balance");
+    emit Transfer(msg.sender, to, amount);
 
-        _balances[msg.sender] -= amount;
-        _balances[to] += amount;
-        emit Transfer(msg.sender, to, amount);
-        return true;
-    }
-    */
-
+    return true;
 
     }
 
@@ -130,6 +117,16 @@ contract ERC20 is IERC20 {
     function approve(address spender, uint256 amount) public virtual override returns (bool) {
          /* <------ Your code goes here ------->
          */
+
+    require(spender != address(0), "ERC20: approve to the zero address");
+
+    _allowances[msg.sender][spender] = amount;
+
+    emit Approval(msg.sender, spender, amount);
+
+    return true;
+
+
     }
 
     /**
@@ -151,7 +148,22 @@ contract ERC20 is IERC20 {
     function transferFrom(address from, address to, uint256 amount) public virtual override returns (bool) {
           /* <------ Your code goes here ------->
          */
+
+    require(from != address(0), "ERC20: transfer from the zero address");
+    require(to != address(0), "ERC20: transfer to the zero address");
+    require(_balances[from] >= amount, "ERC20: transfer amount exceeds balance");
+    require(_allowances[from][msg.sender] >= amount, "ERC20: transfer amount exceeds allowance");
+
+    _allowances[from][msg.sender] -= amount;
+    _balances[from] -= amount;
+    _balances[to] += amount;
+
+    emit Transfer(from, to, amount);
+
+    return true;
+
     }
+
 
     /**
      * @dev Atomically increases the allowance granted to `spender` by the caller.
@@ -215,7 +227,13 @@ contract ERC20 is IERC20 {
          /* <------ Your code goes here ------->
          */
 
-        
+
+   _balances[from] -= amount;
+   _balances[to] += amount;
+
+   emit Transfer(from, to, amount);
+
+
     }
 
     /** @dev Creates `amount` tokens and assigns them to `account`, increasing
